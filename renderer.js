@@ -1,6 +1,6 @@
 /**
- * Renderer Process Controller - Mobile Fallback & Calorie Calibration Edition
- * Implements 1400 kcal daily limits, dynamic deficit status alerts, and force parses food rows before save.
+ * Renderer Process Controller - Mobile Fallback & Sidebar Summary Edition
+ * Fixes LocalStorage date key mapping and renders total calories in the timeline sidebar.
  */
 
 // Global State
@@ -64,6 +64,10 @@ if (!window.api) {
     saveDailyLog: async (dateStr, logData) => {
       const logs = localStorage.getItem('antigravity_logs');
       const list = logs ? JSON.parse(logs) : [];
+      
+      // CRITICAL FIX: Ensure the date property is explicitly saved on the log object
+      logData.date = dateStr;
+      
       const index = list.findIndex(l => l.date === dateStr);
       if (index !== -1) {
         list[index] = logData;
@@ -169,6 +173,16 @@ if (!window.api) {
         targetIntake,
         isFloorActive: false
       };
+    },
+    calculateBMI: async (weight, height) => {
+      const heightMeters = height / 100;
+      return parseFloat((weight / (heightMeters * heightMeters)).toFixed(1));
+    },
+    getBMICategory: async (bmi) => {
+      if (bmi < 18.5) return { category: 'Underweight', color: '#38bdf8' };
+      if (bmi < 25.0) return { category: 'Normal', color: '#4ade80' };
+      if (bmi < 30.0) return { category: 'Overweight', color: '#fb923c' };
+      return { category: 'Obese', color: '#f87171' };
     },
     getWeightTrajectory: async (startDateStr, startWeight, targetDateStr, targetWeight) => {
       const start = new Date(startDateStr);
@@ -670,6 +684,12 @@ async function loadDiaryView() {
     const log = dailyLogs.find(l => l.date === dayDate);
     const isCompleted = log && log.foods && log.foods.length > 0;
 
+    let calorieText = "";
+    if (isCompleted) {
+      const dayCals = log.foods.reduce((sum, f) => sum + (f.calories || 0), 0);
+      calorieText = `<span class="day-card-cals text-cyan text-bold" style="font-size:11px; margin-right:4px;">${dayCals} kcal</span>`;
+    }
+
     const card = document.createElement('div');
     card.className = `day-selection-card ${currentDayIndex === i ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
     
@@ -677,10 +697,13 @@ async function loadDiaryView() {
     
     card.innerHTML = `
       <div class="day-card-meta">
-        <span class="day-card-num">Day ${i} ${isSun ? '(Sunday)' : ''}</span>
+        <span class="day-card-num">Day ${i} ${isSun ? '(Sun)' : ''}</span>
         <span class="day-card-date">${formattedDate}</span>
       </div>
-      <div class="day-card-status-dot"></div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        ${calorieText}
+        <div class="day-card-status-dot"></div>
+      </div>
     `;
 
     card.onclick = () => {
