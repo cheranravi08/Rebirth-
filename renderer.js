@@ -1,6 +1,6 @@
 /**
- * Renderer Process Controller - Mobile Fallback & Fix Edition
- * Fixes initial load ReferenceError crash and maps full LocalStorage fallback for mobile hosting.
+ * Renderer Process Controller - Mobile Fallback & Calorie Calibration Edition
+ * Implements 1400 kcal daily limits, dynamic deficit status alerts, and force parses food rows before save.
  */
 
 // Global State
@@ -11,6 +11,9 @@ let countdownInterval = null;
 // Program Dates Configuration
 const START_DATE = "2026-07-16"; // Day 1
 const TARGET_DATE = "2026-09-30"; // Day 77
+
+// Target Daily Limit calibration
+const DIET_LIMIT_CALORIES = 1400;
 
 // --- WEB / MOBILE BROWSER LOCALSTORAGE FALLBACK MOCK ---
 if (!window.api) {
@@ -156,27 +159,16 @@ if (!window.api) {
       const multiplier = multipliers[activityLevel] || 1.2;
       const baseTdee = Math.round(bmr * multiplier);
       const totalTdee = baseTdee + (workoutCalories || 0);
-      let targetIntake = totalTdee - 1100;
-      if (targetIntake < 1200) targetIntake = 1200;
+      let targetIntake = DIET_LIMIT_CALORIES;
       return {
         bmr: Math.round(bmr),
         baseTdee,
         totalTdee,
         workoutCalories: workoutCalories || 0,
-        deficit: 1100,
+        deficit: totalTdee - DIET_LIMIT_CALORIES,
         targetIntake,
-        isFloorActive: (totalTdee - 1100) < 1200
+        isFloorActive: false
       };
-    },
-    calculateBMI: async (weight, height) => {
-      const heightMeters = height / 100;
-      return parseFloat((weight / (heightMeters * heightMeters)).toFixed(1));
-    },
-    getBMICategory: async (bmi) => {
-      if (bmi < 18.5) return { category: 'Underweight', color: '#38bdf8' };
-      if (bmi < 25.0) return { category: 'Normal', color: '#4ade80' };
-      if (bmi < 30.0) return { category: 'Overweight', color: '#fb923c' };
-      return { category: 'Obese', color: '#f87171' };
     },
     getWeightTrajectory: async (startDateStr, startWeight, targetDateStr, targetWeight) => {
       const start = new Date(startDateStr);
@@ -206,7 +198,6 @@ if (!window.api) {
       return { days, hours, minutes, seconds, isOver: false };
     },
     parseFoodInput: async (inputStr) => {
-      // Local JS parsing dictionaries for mobile offline operations
       const str = inputStr.toLowerCase().trim();
       let result = {
         input: inputStr,
@@ -458,10 +449,10 @@ async function loadDashboardView(user) {
   const todayStr = new Date().toISOString().split('T')[0];
   const age = await window.api.calculateAge(user.dob, todayStr);
 
-  // 1. Load Biometric Mission Blueprint values
+  // 1. Load Biometric Mission Blueprint values (Calibrated to 1400 kcal target)
   const calculatorTdee = await window.api.calculateDailyTarget(user.startWeight, user.height, age, user.activityLevel, 0);
   document.getElementById('bp-maintenance-cals').textContent = `${calculatorTdee.baseTdee} kcal`;
-  document.getElementById('bp-deficit-limit').textContent = `${calculatorTdee.targetIntake} kcal`;
+  document.getElementById('bp-deficit-limit').textContent = `${DIET_LIMIT_CALORIES} kcal`;
 
   // 2. Calculate Completed Days and Overall Program Timeline
   const dailyLogs = await window.api.getDailyLogs();
@@ -481,7 +472,7 @@ async function loadDashboardView(user) {
   const diaryToday = await window.api.getDailyLog(todayStr);
   const workoutBurn = diaryToday.workoutCalBurn || 0;
   
-  // Calculate Target intake
+  // Calculate Target TDEE
   const calculator = await window.api.calculateDailyTarget(
     user.startWeight,
     user.height,
@@ -495,9 +486,10 @@ async function loadDashboardView(user) {
     totalConsumed = diaryToday.foods.reduce((sum, f) => sum + (f.calories || 0), 0);
   }
 
-  // Deficit = TDEE - Consumed = (Base TDEE + Workout Burn) - Consumed
+  // Deficit target achieved
+  const targetDeficit = calculator.totalTdee - DIET_LIMIT_CALORIES;
   const achievedDeficit = calculator.totalTdee - totalConsumed;
-  const percent = Math.min(100, Math.max(0, Math.round((achievedDeficit / 1100) * 100)));
+  const percent = Math.min(100, Math.max(0, Math.round((achievedDeficit / targetDeficit) * 100)));
 
   const ring = document.getElementById('grav-meter-ring');
   const percentTxt = document.getElementById('grav-meter-percent');
@@ -505,18 +497,18 @@ async function loadDashboardView(user) {
   const statusBadge = document.getElementById('dashboard-deficit-status');
 
   percentTxt.textContent = `${percent}%`;
-  detailsTxt.textContent = `${achievedDeficit} / 1100 kcal Deficit`;
+  detailsTxt.textContent = `${achievedDeficit} / ${targetDeficit} kcal Deficit`;
 
   const offset = 471 - (percent / 100) * 471;
   ring.style.strokeDashoffset = offset;
 
-  if (achievedDeficit >= 1100) {
-    statusBadge.textContent = "1100 KCAL DEFICIT MAINTAINED";
+  if (totalConsumed <= DIET_LIMIT_CALORIES) {
+    statusBadge.textContent = "CALORIE DEFICIT SECURED";
     statusBadge.className = "deficit-badge achieved";
     statusBadge.style.boxShadow = "0 0 10px rgba(16, 185, 129, 0.2)";
   } else {
-    const deficitLeft = 1100 - achievedDeficit;
-    statusBadge.textContent = `DEFICIT GAP: ${deficitLeft} KCAL`;
+    const overLimit = totalConsumed - DIET_LIMIT_CALORIES;
+    statusBadge.textContent = `EXCEEDED BY: ${overLimit} KCAL`;
     statusBadge.className = "deficit-badge";
     statusBadge.style.boxShadow = "none";
   }
@@ -528,7 +520,7 @@ async function loadDashboardView(user) {
   // 5. Load measurements to draw weight trajectory chart
   const measurements = await window.api.getMeasurements();
   
-  // Trajectory canvas
+  // Draw trajectory
   setTimeout(() => {
     renderTrajectoryChart(user, measurements);
   }, 100);
@@ -719,16 +711,6 @@ async function loadDiaryView() {
   workoutSelect.value = activeLog.workout || "Rest Day";
   document.getElementById('workout-burn-display').textContent = `${activeLog.workoutCalBurn || 0} kcal`;
 
-  // Calculate dynamic calorie targets
-  const age = await window.api.calculateAge(user.dob, activeDate);
-  const targetData = await window.api.calculateDailyTarget(
-    user.startWeight,
-    user.height,
-    age,
-    user.activityLevel,
-    activeLog.workoutCalBurn || 0
-  );
-
   // Load food rows (Spacious Ergonomic row layout)
   const foodsList = document.getElementById('diary-foods-list');
   foodsList.innerHTML = '';
@@ -747,7 +729,7 @@ async function loadDiaryView() {
   document.getElementById('water-volume-txt').textContent = `${loggedWater} / 3000 ml`;
   document.getElementById('water-fill-level').style.height = `${Math.min(100, (loggedWater / 3000) * 100)}%`;
 
-  recalculateSimplifiedDiarySummary(targetData.targetIntake, activeLog.workoutCalBurn || 0);
+  recalculateSimplifiedDiarySummary(DIET_LIMIT_CALORIES, activeLog.workoutCalBurn || 0);
 }
 
 // Add unified food logger row in Ergonomic layout (No squeezed columns!)
@@ -821,24 +803,12 @@ function onWorkoutRoutineChanged() {
   recalculateSimplifiedDiarySummary(null, burn);
 }
 
-// Recalculate summary totals
+// Recalculate summary totals (Calibrated to 1400 Limit Deficit/Exceeded labels)
 async function recalculateSimplifiedDiarySummary(forcedTarget = null, forcedBurn = null) {
   const user = await window.api.getUser();
-  const activeDate = getDateFromDayIndex(currentDayIndex);
   
   let workoutBurn = forcedBurn !== null ? forcedBurn : (parseInt(document.getElementById('workout-burn-display').textContent) || 0);
-
-  // Dynamic TDEE
-  const age = await window.api.calculateAge(user.dob, activeDate);
-  const targetData = await window.api.calculateDailyTarget(
-    user.startWeight,
-    user.height,
-    age,
-    user.activityLevel,
-    workoutBurn
-  );
-
-  const targetCalories = forcedTarget !== null ? forcedTarget : targetData.targetIntake;
+  const targetCalories = DIET_LIMIT_CALORIES;
 
   let totalConsumed = 0;
   let totalProtein = 0;
@@ -851,8 +821,6 @@ async function recalculateSimplifiedDiarySummary(forcedTarget = null, forcedBurn
     totalProtein += protein;
   });
 
-  const remaining = targetCalories - totalConsumed + workoutBurn;
-
   // Set display numbers
   document.getElementById('diary-stat-target').textContent = targetCalories;
   document.getElementById('diary-stat-consumed').textContent = totalConsumed;
@@ -861,22 +829,27 @@ async function recalculateSimplifiedDiarySummary(forcedTarget = null, forcedBurn
   
   const remainingEl = document.getElementById('diary-stat-remaining');
   const remainingLabel = document.getElementById('diary-stat-remaining-label');
-  remainingEl.textContent = Math.abs(remaining);
 
-  if (remaining >= 0) {
-    remainingLabel.textContent = "Remaining Calories";
+  if (totalConsumed <= targetCalories) {
+    const remaining = targetCalories - totalConsumed;
+    remainingEl.textContent = remaining;
+    remainingLabel.textContent = "Successful Calorie Deficit";
+    remainingLabel.style.color = "#10b981"; // Emerald Green
     remainingEl.className = "stat-num text-cyan";
   } else {
-    remainingLabel.textContent = "Budget Overdraft";
+    const exceeded = totalConsumed - targetCalories;
+    remainingEl.textContent = exceeded;
+    remainingLabel.textContent = `Exceeded by (${exceeded}) kcal`;
+    remainingLabel.style.color = "#ef4444"; // Rose Red
     remainingEl.className = "stat-num text-rose";
   }
 
   // Update progress bar
   const progressBar = document.getElementById('diary-progress-bar');
-  const progressPercent = Math.min(100, Math.max(0, (totalConsumed / (targetCalories + workoutBurn)) * 100));
+  const progressPercent = Math.min(100, Math.max(0, (totalConsumed / targetCalories) * 100));
   progressBar.style.width = `${progressPercent}%`;
 
-  if (remaining < 0) {
+  if (totalConsumed > targetCalories) {
     progressBar.style.background = 'linear-gradient(to right, var(--color-rose), #f43f5e)';
   } else {
     progressBar.style.background = 'linear-gradient(to right, var(--color-cyan), var(--color-purple))';
@@ -885,15 +858,32 @@ async function recalculateSimplifiedDiarySummary(forcedTarget = null, forcedBurn
 
 function setupDiaryListeners() {
   document.getElementById('btn-save-simplified-diary').addEventListener('click', async () => {
+    // 1. Force parse all inputs asynchronously before saving (fixes browser tap-save without blur issue)
+    const rows = document.querySelectorAll('#diary-foods-list .food-entry-row');
+    for (const row of rows) {
+      const inputEl = row.querySelector('.food-entry-name');
+      const val = inputEl.value.trim();
+      if (val) {
+        const parsed = await window.api.parseFoodInput(val);
+        row.querySelector('.cal-val').textContent = parsed.calories;
+        row.querySelector('.prot-val').textContent = parsed.protein;
+        row.querySelector('.notes-val').textContent = parsed.notes;
+        row.querySelector('.badge-notes').setAttribute('title', parsed.notes);
+      }
+    }
+
+    // Force recalculate UI
+    await recalculateSimplifiedDiarySummary();
+
     const activeDate = getDateFromDayIndex(currentDayIndex);
     const workout = document.getElementById('workout-routine-select').value;
     const workoutCalBurn = parseInt(document.getElementById('workout-burn-display').textContent) || 0;
     const waterIntake = parseInt(document.getElementById('water-volume-txt').textContent.split('/')[0].trim()) || 0;
 
     const foods = [];
-    const rows = document.querySelectorAll('#diary-foods-list .food-entry-row');
+    const updatedRows = document.querySelectorAll('#diary-foods-list .food-entry-row');
     
-    rows.forEach(row => {
+    updatedRows.forEach(row => {
       const input = row.querySelector('.food-entry-name').value.trim();
       const calories = parseInt(row.querySelector('.cal-val').textContent) || 0;
       const protein = parseInt(row.querySelector('.prot-val').textContent) || 0;
@@ -1016,7 +1006,7 @@ async function loadProfileView(user) {
   
   document.getElementById('profile-bmr').textContent = `${calcData.bmr} kcal`;
   document.getElementById('profile-tdee').textContent = `${calcData.baseTdee} kcal`;
-  document.getElementById('profile-target-intake').textContent = `${calcData.targetIntake} kcal`;
+  document.getElementById('profile-target-intake').textContent = `${DIET_LIMIT_CALORIES} kcal`;
 
   // BMI calculations
   const bmi = await window.api.calculateBMI(currentWeight, user.height);
