@@ -1,0 +1,7 @@
+node_modules/
+data/
+package.json
+package-lock.json
+main.js
+preload.js
+icon.png
