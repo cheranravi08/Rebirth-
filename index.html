@@ -3,537 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Transformation Maker</title>
+  <title>Antigravity Calorie Tracker</title>
   <!-- Google Fonts: Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
 
-  <!-- App Shell -->
-  <div class="app-container">
-    
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-logo">
-          <svg viewBox="0 0 100 100" class="logo-svg">
-            <defs>
-              <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#06b6d4" />
-                <stop offset="100%" stop-color="#c084fc" />
-              </linearGradient>
-            </defs>
-            <circle cx="50" cy="50" r="40" fill="none" stroke="url(#logo-grad)" stroke-width="4" stroke-dasharray="10 5 15 5"/>
-            <path d="M 35 60 L 50 35 L 65 60 Z" fill="none" stroke="url(#logo-grad)" stroke-width="4" stroke-linejoin="round"/>
-            <circle cx="50" cy="35" r="5" fill="#c084fc"/>
-          </svg>
-        </div>
-        <div class="brand-text">
+  <div class="sheet-container">
+    <!-- Header Controls -->
+    <header class="sheet-header">
+      <div class="header-logo">
+        <div class="logo-symbol">▲</div>
+        <div class="logo-text">
           <h1>ANTIGRAVITY</h1>
-          <p>TRANSFORMATION MAKER</p>
+          <span>CYBER-SHEET LOG</span>
         </div>
       </div>
       
-      <nav class="nav-links">
-        <a href="#" class="nav-link active" data-view="dashboard" id="nav-dashboard">
-          <svg viewBox="0 0 24 24" class="nav-icon"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-          <span>Dashboard</span>
-        </a>
-        <a href="#" class="nav-link" data-view="diary" id="nav-diary">
-          <svg viewBox="0 0 24 24" class="nav-icon"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-          <span>Daily Diary</span>
-        </a>
-        <a href="#" class="nav-link" data-view="workout" id="nav-workout">
-          <svg viewBox="0 0 24 24" class="nav-icon"><path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14 4.14 5.57 2 7.71 3.43 9.14 2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22 14.86 20.57 17 17 20.57 20.57 22 19.14 20.57 17.71 22 15.57z"/></svg>
-          <span>Workout History</span>
-        </a>
-        <a href="#" class="nav-link" data-view="profile" id="nav-profile">
-          <svg viewBox="0 0 24 24" class="nav-icon"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          <span>My Profile</span>
-        </a>
-      </nav>
-      
-      <!-- User Widget -->
-      <div class="sidebar-user">
-        <div class="user-avatar">C</div>
-        <div class="user-details">
-          <div class="user-name">Cheran</div>
-          <div class="user-status" id="sidebar-days-count">Day 1 of 77</div>
+      <div class="calibration-controls">
+        <div class="control-group">
+          <label for="sheet-maintenance-input">Maintenance Calorie</label>
+          <input type="number" id="sheet-maintenance-input" value="2500" placeholder="e.g. 2500">
         </div>
+        <div class="control-group">
+          <label for="sheet-target-input">Target Calorie</label>
+          <input type="number" id="sheet-target-input" value="1500" placeholder="e.g. 1500">
+        </div>
+        <button class="btn btn-save" id="btn-save-sheet">Save Logs</button>
       </div>
-    </aside>
+    </header>
 
-    <!-- Main Content Area -->
-    <main class="main-content">
-      
-      <!-- 1. DASHBOARD VIEW -->
-      <section id="view-dashboard" class="content-section active">
-        <div class="section-header">
-          <div>
-            <h2 class="view-title">CHERAN'S TRANSFORM MISSION</h2>
-            <p class="view-subtitle">Deficit Target: 1100 kcal daily | Day 1 to Day 77 Plan</p>
-          </div>
-          <div class="current-date-badge" id="dashboard-date">July 16, 2026</div>
-        </div>
-
-        <!-- MISSION BLUEPRINT PANEL (CORE CALCULATIONS ON LAUNCH) -->
-        <div class="card glass-card blueprint-card">
-          <h3 class="card-title text-cyan">BIOMETRIC MISSION BLUEPRINT</h3>
-          <div class="blueprint-grid">
-            <div class="blueprint-box">
-              <div class="bp-num">80.0 kg</div>
-              <div class="bp-label">Starting Weight</div>
-            </div>
-            <div class="blueprint-box">
-              <div class="bp-num">170 cm</div>
-              <div class="bp-label">Starting Height</div>
-            </div>
-            <div class="blueprint-box">
-              <div class="bp-num text-purple" id="bp-maintenance-cals">2200 kcal</div>
-              <div class="bp-label">Maintenance (TDEE)</div>
-            </div>
-            <div class="blueprint-box">
-              <div class="bp-num text-rose">-1100 kcal</div>
-              <div class="bp-label">Deficit Limit</div>
-            </div>
-            <div class="blueprint-box">
-              <div class="bp-num text-cyan" id="bp-deficit-limit">1100 kcal</div>
-              <div class="bp-label">Target Intake Limit</div>
-            </div>
-            <div class="blueprint-box">
-              <div class="bp-num">1.0 kg / wk</div>
-              <div class="bp-label">Weekly Loss Rate</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Completion Progress Card -->
-        <div class="card glass-card">
-          <div class="card-header-flex">
-            <h4 class="card-title">TRANSFORMATION PROGRAM TIMELINE</h4>
-            <span class="text-cyan text-bold" id="program-completed-percentage">1% Completed</span>
-          </div>
-          <div class="progress-bar-container margin-top-md" style="height: 12px;">
-            <div class="progress-bar-fill" id="program-progress-bar" style="width: 1.3%;"></div>
-          </div>
-          <div class="progress-labels text-sm text-secondary margin-top-md" style="display:flex; justify-content:space-between;">
-            <span>Day 1 (July 16)</span>
-            <span class="text-bold text-white" id="program-completed-days">1 of 77 Days Logged</span>
-            <span>Day 77 (Sept 30)</span>
-          </div>
-        </div>
-
-        <div class="dashboard-grid-wide">
-          
-          <!-- Left Column: Deficit Ring + Quote -->
-          <div class="dashboard-wide-left">
-            
-            <!-- Grav-O-Meter Widget -->
-            <div class="card glass-card hover-glow accent-border-cyan">
-              <h3 class="card-title">GRAV-O-METER</h3>
-              <div class="meter-container">
-                <svg viewBox="0 0 200 200" class="radial-gauge">
-                  <circle cx="100" cy="100" r="75" class="gauge-bg"/>
-                  <circle cx="100" cy="100" r="75" class="gauge-progress" id="grav-meter-ring" stroke="url(#gauge-grad)" filter="url(#glow-filter)"/>
-                </svg>
-                <div class="meter-text">
-                  <div class="meter-percentage" id="grav-meter-percent">0%</div>
-                  <div class="meter-label">Today's Deficit</div>
-                  <div class="meter-sub" id="grav-meter-details">0 / 1100 kcal</div>
-                </div>
-              </div>
-              <div class="deficit-badge" id="dashboard-deficit-status">DEFICIT UNMET</div>
-            </div>
-
-            <!-- Affirmations Widget -->
-            <div class="card glass-card hover-glow">
-              <div class="affirmation-container">
-                <div class="affirmation-quote-icon">“</div>
-                <p class="affirmation-text" id="affirmation-text">Gravity is just a force. Your willpower is a choice. Defy the weight, find the lightness.</p>
-                <div class="affirmation-author">— Antigravity Directive</div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Right Column: Trajectory Chart (Full Width focus) -->
-          <div class="dashboard-wide-right">
-            <div class="card glass-card hover-glow" style="height: 100%;">
-              <div class="card-header-flex">
-                <h3 class="card-title">WEIGHT TRAJECTORY (JULY 16 - SEPT 30)</h3>
-                <span class="trajectory-legend"><span class="legend-target"></span> Target Trajectory &nbsp; <span class="legend-actual"></span> Actual weight</span>
-              </div>
-              <div class="chart-wrapper" style="height: 380px;">
-                <canvas id="weightTrajectoryCanvas"></canvas>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- 2. DAILY DIARY VIEW -->
-      <section id="view-diary" class="content-section">
-        <div class="diary-view-layout">
-          
-          <!-- Left Sidebar: Day 1 - 77 Calendar Timeline -->
-          <aside class="diary-timeline-sidebar">
-            <h4 class="timeline-sidebar-title">PROGRAM CALENDAR</h4>
-            <div class="days-list-container" id="timeline-days-list">
-              <!-- JS Injects Day 1 through Day 77 -->
-            </div>
-          </aside>
-
-          <!-- Right Pane: Daily Log Editor -->
-          <div class="diary-editor-pane">
-            <div class="section-header">
-              <div>
-                <h2 class="view-title" id="diary-day-title">DAY 1 LOG</h2>
-                <p class="view-subtitle" id="diary-day-subtitle">July 16, 2026</p>
-              </div>
-            </div>
-
-            <!-- Calorie Banner Indicators -->
-            <div class="card glass-card calorie-budget-card">
-              <div class="budget-stat-grid">
-                <div class="budget-stat-box">
-                  <div class="stat-num" id="diary-stat-target">1200</div>
-                  <div class="stat-label">Daily Budget (kcal)</div>
-                </div>
-                <div class="stat-operator">-</div>
-                <div class="budget-stat-box">
-                  <div class="stat-num text-cyan" id="diary-stat-consumed">0</div>
-                  <div class="stat-label">Consumed</div>
-                </div>
-                <div class="stat-operator">+</div>
-                <div class="budget-stat-box">
-                  <div class="stat-num text-purple" id="diary-stat-burned">0</div>
-                  <div class="stat-label">Workout Burned</div>
-                </div>
-                <div class="stat-operator">=</div>
-                <div class="budget-stat-box">
-                  <div class="stat-num" id="diary-stat-remaining">1200</div>
-                  <div class="stat-label" id="diary-stat-remaining-label">Remaining Calories</div>
-                </div>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="diary-progress-bar"></div>
-              </div>
-            </div>
-
-            <!-- Grid: Foods Table & Workout Selector -->
-            <div class="diary-sections-grid-simplified">
-              
-              <!-- Unified Foods Log List Card (Ergonomic wide list layout - full width) -->
-              <div class="card glass-card">
-                <div class="card-header-flex">
-                  <h3 class="card-title">FOODS LOG TODAY</h3>
-                  <span class="text-sm text-cyan font-bold" id="diary-total-protein">Total Protein: 0g</span>
-                </div>
-                <p class="card-desc">Type your entries (e.g. "3 Nos Chapati", "250ml milk", "200g chicken breast"). Tab/click out to auto-estimate.</p>
-                
-                <!-- Ergonomic List Container -->
-                <div class="food-rows-container" id="diary-foods-list">
-                  <!-- Wide food item rows injected dynamically here -->
-                </div>
-                
-                <button class="btn btn-outline margin-top-md" onclick="addFoodRowSimplified()">+ Add Food Entry</button>
-              </div>
-
-              <!-- Workout and Hydration Split Bottom Row -->
-              <div class="diary-bottom-row">
-                <!-- Workout Card -->
-                <div class="card glass-card">
-                  <h3 class="card-title">GYM WORKOUT ROUTINE</h3>
-                  
-                  <div class="form-group">
-                    <label for="workout-routine-select">Gym Workout / Routine</label>
-                    <select id="workout-routine-select" class="form-control" onchange="onWorkoutRoutineChanged()">
-                      <option value="Rest Day">Rest Day / Leave (0 kcal)</option>
-                      <option value="Chest Day">Chest Day (200 kcal)</option>
-                      <option value="Biceps Day">Biceps Day (150 kcal)</option>
-                      <option value="Triceps Day">Triceps Day (150 kcal)</option>
-                      <option value="Shoulders Day">Shoulders Day (180 kcal)</option>
-                      <option value="Back Day">Back Day (220 kcal)</option>
-                      <option value="Leg Day">Leg Day (250 kcal)</option>
-                      <option value="Cardio Day">Cardio Day (300 kcal)</option>
-                    </select>
-                  </div>
-
-                  <div class="cardio-burn-preview margin-top-md">
-                    <span>Estimated Caloric Burn:</span>
-                    <strong class="text-purple" id="workout-burn-display">0 kcal</strong>
-                  </div>
-                </div>
-
-                <!-- Hydration Card -->
-                <div class="card glass-card">
-                  <h3 class="card-title">HYDRATION LOG</h3>
-                  <div class="water-container">
-                    <div class="water-glass-display">
-                      <div class="water-fill" id="water-fill-level"></div>
-                      <div class="water-text-overlay" id="water-volume-txt">0 / 3000 ml</div>
-                    </div>
-                    <div class="water-buttons">
-                      <button class="btn btn-secondary text-sm" onclick="addWater(250)">+250 ml Glass</button>
-                      <button class="btn btn-secondary text-sm" onclick="addWater(500)">+500 ml Bottle</button>
-                      <button class="btn btn-text text-sm" onclick="resetWater()" style="color:#ef4444; width:100%; text-align:left;">Reset Water</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Save Action Button -->
-            <button class="btn btn-primary full-width text-bold glow-btn-cyan margin-top-lg" id="btn-save-simplified-diary" style="padding:16px;">Save Today's Logs</button>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- 3. WORKOUT HISTORY VIEW (77-DAY CONSISTENCY GRID) -->
-      <section id="view-workout" class="content-section">
-        <div class="section-header">
-          <div>
-            <h2 class="view-title">77-DAY WORKOUT HISTORY</h2>
-            <p class="view-subtitle">Map of your workouts from Day 1 to Day 77 (Sundays are Rest Days)</p>
-          </div>
-        </div>
-
-        <div class="card glass-card">
-          <h3 class="card-title text-center margin-bottom-lg">ROUTINE CONSISTENCY GRID</h3>
-          <div class="workout-consistency-grid" id="workout-grid-container">
-            <!-- Dynamic 77 boxes generated -->
-          </div>
-
-          <div class="workout-legend margin-top-lg" style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--text-secondary);">
-            <span><span class="legend-color-box color-rest"></span> Rest Day / Unlogged</span>
-            <span><span class="legend-color-box color-chest"></span> Chest / Back / Legs (200-250 kcal)</span>
-            <span><span class="legend-color-box color-arms"></span> Biceps / Triceps / Shoulders (150-180 kcal)</span>
-            <span><span class="legend-color-box color-cardio"></span> Cardio Day (300 kcal)</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. MY PROFILE VIEW (SETTINGS & WEEKLY MEASUREMENTS LOGGER) -->
-      <section id="view-profile" class="content-section">
-        <div class="section-header">
-          <div>
-            <h2 class="view-title">MY PROFILE & MEASUREMENTS</h2>
-            <p class="view-subtitle">Biometric configurations, deadline countdown, and tape check-ins</p>
-          </div>
-        </div>
-
-        <!-- Countdown Timer Card (Giant Visual) -->
-        <div class="card glass-card countdown-card">
-          <h3 class="countdown-title">COUNTDOWN TO SEPT 30, 2026 DEADLINE</h3>
-          <p class="countdown-subtitle">Target Weight: 64.0 kg | Day 77</p>
-          <div class="countdown-timer" id="countdown-clock">
-            <div class="timer-unit">
-              <span class="timer-value" id="cd-days">00</span>
-              <span class="timer-label">DAYS</span>
-            </div>
-            <div class="timer-divider">:</div>
-            <div class="timer-unit">
-              <span class="timer-value" id="cd-hours">00</span>
-              <span class="timer-label">HOURS</span>
-            </div>
-            <div class="timer-divider">:</div>
-            <div class="timer-unit">
-              <span class="timer-value" id="cd-mins">00</span>
-              <span class="timer-label">MINS</span>
-            </div>
-            <div class="timer-divider">:</div>
-            <div class="timer-unit">
-              <span class="timer-value" id="cd-secs">00</span>
-              <span class="timer-label">SECS</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="profile-layout-grid">
-          
-          <!-- Column: Form to Upload Measurements & Historical Log Table -->
-          <div class="profile-measurements-col">
-            
-            <!-- Check-in Form Card -->
-            <div class="card glass-card">
-              <h3 class="card-title text-cyan">WEEKLY CHECK-IN LOG</h3>
-              <p class="card-desc">Record weight and body circumference values (without photos).</p>
-              
-              <form id="form-checkin" class="form-grid">
-                <div class="form-group span-2">
-                  <label for="checkin-date">Log Date</label>
-                  <input type="date" id="checkin-date" class="form-control">
-                </div>
-
-                <div class="form-group">
-                  <label for="checkin-weight">Weight (kg)</label>
-                  <input type="number" id="checkin-weight" class="form-control" step="0.1" value="79.0">
-                </div>
-
-                <div class="form-group">
-                  <label for="checkin-waist">Waist (cm)</label>
-                  <input type="number" id="checkin-waist" class="form-control" step="0.1" value="93.0">
-                </div>
-
-                <div class="form-group">
-                  <label for="checkin-chest">Chest (cm)</label>
-                  <input type="number" id="checkin-chest" class="form-control" step="0.1" value="101.0">
-                </div>
-
-                <div class="form-group">
-                  <label for="checkin-neck">Neck (cm)</label>
-                  <input type="number" id="checkin-neck" class="form-control" step="0.1" value="38.8">
-                </div>
-
-                <div class="form-group span-2">
-                  <label for="checkin-bicep">Bicep (cm)</label>
-                  <input type="number" id="checkin-bicep" class="form-control" step="0.1" value="36.3">
-                </div>
-
-                <button type="submit" class="btn btn-primary span-2 text-bold glow-btn-purple">Log Check-in Measurements</button>
-              </form>
-            </div>
-
-            <!-- Historical Log list -->
-            <div class="card glass-card">
-              <h3 class="card-title">MEASUREMENTS LOG ARCHIVE</h3>
-              <div class="table-scroll-container">
-                <table class="measurements-log-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Weight</th>
-                      <th>Waist</th>
-                      <th>Chest</th>
-                      <th>Neck</th>
-                      <th>Bicep</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="measurements-history-tbody">
-                    <!-- Loaded dynamically -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Column: Settings Form & Dynamic Metrics -->
-          <div class="profile-settings-col">
-            
-            <div class="card glass-card">
-              <h3 class="card-title">DYNAMIC CALCULATION METRICS</h3>
-              
-              <div class="metric-row">
-                <span class="metric-label">Calculated Age</span>
-                <strong class="metric-val" id="profile-age">0 years</strong>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Basal Metabolic Rate (BMR)</span>
-                <strong class="metric-val" id="profile-bmr">0 kcal</strong>
-              </div>
-              <div class="metric-row">
-                <span class="metric-label">Base TDEE (Sedentary Multiplier)</span>
-                <strong class="metric-val" id="profile-tdee">0 kcal</strong>
-              </div>
-              <div class="metric-row font-lg accent-text-cyan">
-                <span class="metric-label">Daily Diet Budget (TDEE - 1100)</span>
-                <strong class="metric-val" id="profile-target-intake">0 kcal</strong>
-              </div>
-              
-              <!-- BMI Tracker -->
-              <div class="bmi-tracker-container">
-                <div class="bmi-header">
-                  <span>Body Mass Index (BMI):</span>
-                  <strong id="profile-bmi-val">0.0</strong>
-                  <span class="bmi-badge" id="profile-bmi-badge" style="background-color: #38bdf8;">Normal</span>
-                </div>
-                <div class="bmi-bar">
-                  <div class="bmi-bar-segment segment-under"></div>
-                  <div class="bmi-bar-segment segment-normal"></div>
-                  <div class="bmi-bar-segment segment-over"></div>
-                  <div class="bmi-bar-segment segment-obese"></div>
-                  <div class="bmi-marker" id="profile-bmi-marker"></div>
-                </div>
-                <div class="bmi-labels text-sm">
-                  <span>Under 18.5</span>
-                  <span>18.5 - 24.9</span>
-                  <span>25 - 29.9</span>
-                  <span>30+</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Profile Settings -->
-            <div class="card glass-card">
-              <h3 class="card-title">SETUP BIOMETRIC SETTINGS</h3>
-              <form id="form-profile" class="form-grid">
-                <div class="form-group">
-                  <label for="prof-name">Name</label>
-                  <input type="text" id="prof-name" class="form-control" value="Cheran">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-height">Height (cm)</label>
-                  <input type="number" id="prof-height" class="form-control" value="170">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-dob">Date of Birth</label>
-                  <input type="date" id="prof-dob" class="form-control" value="1995-09-12">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-activity">General Activity Level</label>
-                  <select id="prof-activity" class="form-control">
-                    <option value="sedentary" selected>Sedentary (No Active Workouts)</option>
-                    <option value="lightly_active">Lightly Active (Light 1-3 days/wk)</option>
-                    <option value="moderately_active">Moderately Active (Mod 3-5 days/wk)</option>
-                    <option value="very_active">Very Active (Heavy 6-7 days/wk)</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-startweight">Start Weight (kg)</label>
-                  <input type="number" id="prof-startweight" class="form-control" step="0.1" value="80.0">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-startdate">Start Date</label>
-                  <input type="date" id="prof-startdate" class="form-control" value="2026-07-16">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-targetweight">Target Weight (kg)</label>
-                  <input type="number" id="prof-targetweight" class="form-control" step="0.1" value="64.0">
-                </div>
-
-                <div class="form-group">
-                  <label for="prof-targetdate">Target Date</label>
-                  <input type="date" id="prof-targetdate" class="form-control" value="2026-09-30">
-                </div>
-
-                <button type="submit" class="btn btn-primary span-2 text-bold">Save Settings & Recalculate</button>
-              </form>
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
+    <!-- Spreadsheet Section -->
+    <main class="sheet-grid-wrapper">
+      <div class="grid-table-container">
+        <table class="cyber-sheet">
+          <thead>
+            <tr>
+              <th style="width: 100px;">date / month</th>
+              <th style="min-width: 320px;">food</th>
+              <th style="width: 120px;">calorie</th>
+              <th style="width: 120px;">proteins</th>
+              <th style="width: 140px;">deficit kcal</th>
+              <th style="width: 130px;">target calorie</th>
+              <th style="width: 155px;">maintenance calorie</th>
+            </tr>
+          </thead>
+          <tbody id="sheet-rows-tbody">
+            <!-- Dynamic rows will be generated here from July 16 to Sept 30 -->
+          </tbody>
+        </table>
+      </div>
     </main>
-
   </div>
 
-  <script src="renderer.js?v=3"></script>
+  <script src="renderer.js?v=4"></script>
 </body>
 </html>
